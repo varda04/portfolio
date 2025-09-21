@@ -1,35 +1,44 @@
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
-
-export async function getMistralReply(message) {
-  const url = 'https://api.mistral.ai/v1/chat/completions';
-
-    console.log("Env key starts with:", MISTRAL_API_KEY?.slice(0, 5) || "undefined");
-
-  const payload = {
-    model: "mistral-small-latest",   // works (you tested with curl!)
-    messages: [
-      { role: "system", content: "You are a helpful assistant." },
-      { role: "user", content: message }
-    ]
-  };
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${MISTRAL_API_KEY}`
-    },
-    body: JSON.stringify(payload)
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Mistral API error: ${res.status} ${errText}`);
+// api/chat.js
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const data = await res.json();
-  console.log("Mistral raw response:", data);
+  const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+  if (!MISTRAL_API_KEY) {
+    console.error("❌ No MISTRAL_API_KEY found in environment");
+    return res.status(500).json({ error: "Missing API key" });
+  }
 
-  // ✅ This now matches the JSON you saw from curl
-  return data.choices?.[0]?.message?.content || "Hmm... I have no idea.";
+  try {
+    const { message } = req.body;
+
+    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${MISTRAL_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "mistral-small-latest",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: message },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Mistral API error ${response.status}: ${text}`);
+    }
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "No reply";
+
+    res.status(200).json({ reply });
+  } catch (err) {
+    console.error("❌ Error in /api/chat:", err);
+    res.status(500).json({ error: err.message });
+  }
 }
