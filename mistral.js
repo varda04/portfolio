@@ -3,6 +3,8 @@ const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 export async function getMistralReply(message) {
   const url = 'https://api.mistral.ai/v1/chat/completions';
 
+    console.log("Env key starts with:", MISTRAL_API_KEY?.slice(0, 5) || "undefined");
+
   const payload = {
     model: "mistral-small-latest",   // works (you tested with curl!)
     messages: [
