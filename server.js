@@ -1,23 +1,26 @@
-import express from 'express';  // or 'const express = require("express");' if using CJS
-import path from 'path';
-import { getMistralReply } from './mistral.js';
-
-const app = express();
-app.use(express.json());
-
-// Serve static frontend
-app.use(express.static(path.join(__dirname, 'public'))); // put your HTML/CSS/JS in 'public/'
-
-// API route
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { message } = req.body;
-    const reply = await getMistralReply(message);
-    res.json({ reply });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Something went wrong' });
+export async function getMistralReply(message) {
+  if (!message) {
+    console.warn('No message provided');
+    return "I don't know what to say";
   }
-});
 
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+  try {
+    const res = await fetch('https://api.mistral.ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+
+    if (!res.ok) {
+      console.error('API returned non-200 status:', res.status);
+      return "I don't know what to say";
+    }
+
+    const data = await res.json();
+    console.log('API response:', data);
+    return data.reply || "I don't know what to say";
+  } catch (err) {
+    console.error('Error calling Mistral:', err);
+    return "I don't know what to say";
+  }
+}
