@@ -1,11 +1,12 @@
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
-async function getMistralReply(message) {
+export async function getMistralReply(message) {
   const url = 'https://api.mistral.ai/v1/chat/completions';
 
   const payload = {
-    model: "mistral-small",   // correct model name
+    model: "mistral-small-latest",   // works (you tested with curl!)
     messages: [
+      { role: "system", content: "You are a helpful assistant." },
       { role: "user", content: message }
     ]
   };
@@ -25,9 +26,8 @@ async function getMistralReply(message) {
   }
 
   const data = await res.json();
+  console.log("Mistral raw response:", data);
 
-  // Correct way to get text reply
+  // ✅ This now matches the JSON you saw from curl
   return data.choices?.[0]?.message?.content || "Hmm... I have no idea.";
 }
-
-module.exports = { getMistralReply };
