@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Prince Portfolio MVP</title>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    canvas { background: #000000; display: block; margin: 0 auto; }
+    #scrollContent {
+        background: transparent;
+        padding: 20px;
+        max-width: 500px; /* slightly smaller than scroll width */
+        margin: 0 auto;   /* center content horizontally */
+        color: #4b2e05;
+        font-family: 'Papyrus', serif;
+        line-height: 1.5;
+        text-shadow: 1px 1px 2px #fff;
+    }
+    #projectScroll {
+      display: none;
+      position: fixed;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 800px;
+      overflow-y: auto;
+      font-family: 'Papyrus', serif;
+      color: #4b2e05;
+      text-shadow: 1px 1px 2px #fff;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      z-index: 1000;
+      background: url('./sprite/scroll.png') no-repeat top;
+      background-size: cover;
+      scrollbar-width: none;
+  }
+#projectScroll::-webkit-scrollbar {
+    display: none; /* hides scrollbar */
+}
+
+#projectScrollContent {
+    position: relative;
+}
+#educationPopup {
+  display: none;
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  max-width: 90%;
+  background: linear-gradient(145deg, #fdf6e3, #f0e3c8); /* parchment gradient */
+  border: 4px double #b8860b; /* antique golden border */
+  border-radius: 20px;
+  padding: 30px 40px;
+  font-family: 'Cinzel', serif; /* medieval/ancient font */
+  color: #4b2e05;
+  text-shadow: 1px 1px 3px #fff8;
+  box-shadow: 0 0 30px rgba(0,0,0,0.7);
+  z-index: 2000;
+  animation: popupFade 0.4s ease-out;
+}
+
+#educationPopup h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 32px;
+  color: #8b4513;
+  border-bottom: 3px dotted #d4af37;
+  padding-bottom: 12px;
+  font-family: 'Almendra', serif;
+}
+
+#educationPopup ul {
+  list-style: none;
+  padding: 0;
+}
+
+#educationPopup li {
+  margin: 18px 0;
+  padding: 15px;
+  background: rgba(255, 248, 220, 0.7); /* parchment highlight */
+  border-left: 4px solid #d4af37; /* scroll-like marker */
+  border-radius: 12px;
+  box-shadow: inset 0 0 8px rgba(184, 134, 11, 0.4);
+  transition: transform 0.2s;
+}
+#educationPopup li:hover {
+  transform: scale(1.03);
+  background: rgba(255, 248, 200, 0.85);
+}
+
+#educationPopup button {
+  display: block;
+  margin: 25px auto 0;
+  padding: 12px 28px;
+  background: linear-gradient(to bottom, #d2a679, #a67c52);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #4b2e05;
+  transition: all 0.3s ease;
+}
+#educationPopup button:hover {
+  background: linear-gradient(to bottom, #b47b50, #8b5e3c);
+  transform: translateY(-2px);
+}
+
+@keyframes popupFade {
+  0% { opacity: 0; transform: translate(-50%, -55%) scale(0.95); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+#skillsPopup {
+  display: none;
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  max-width: 90%;
+  background: linear-gradient(145deg, #fdf6e3, #f0e3c8);
+  border: 4px double #b8860b;
+  border-radius: 20px;
+  padding: 30px 40px;
+  font-family: 'Cinzel', serif;
+  color: #4b2e05;
+  text-shadow: 1px 1px 3px #fff8;
+  box-shadow: 0 0 30px rgba(0,0,0,0.7);
+  z-index: 2000;
+  animation: popupFade 0.4s ease-out;
+}
+
+#skillsPopup h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 32px;
+  color: #8b4513;
+  border-bottom: 3px dotted #d4af37;
+  padding-bottom: 12px;
+  font-family: 'Almendra', serif;
+}
+
+#skillsPopup ul {
+  list-style: none;
+  padding: 0;
+}
+
+#skillsPopup li {
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(255, 248, 220, 0.7);
+  border-left: 4px solid #d4af37;
+  border-radius: 12px;
+  position: relative;
+}
+
+#skillsPopup li::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(to right, #b8860b, #ffdf7e);
+  border-radius: 12px;
+  z-index: -1;
+  transition: width 1s ease-in-out;
+}
+
+#skillsPopup li[data-level]::after {
+  width: attr(data-level '%'); /* fallback for JS below */
+}
+
+#skillsPopup button {
+  display: block;
+  margin: 25px auto 0;
+  padding: 12px 28px;
+  background: linear-gradient(to bottom, #d2a679, #a67c52);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #4b2e05;
+  transition: all 0.3s ease;
+}
+#skillsPopup button:hover {
+  background: linear-gradient(to bottom, #b47b50, #8b5e3c);
+  transform: translateY(-2px);
+}
+
+#stoneBanner {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 25px 50px;
+  min-width: 400px;
+  max-width: 80%;
+  text-align: center;
+
+}
+  </style>
+</head>
+<body>
+<div id="projectScroll" style="
+    display: none;
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1000px;
+    height: 400px;
+    overflow-y: auto;
+    font-family: 'Papyrus', serif;
+    color: #4b2e05;
+    text-shadow: 1px 1px 2px #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    z-index: 1000;
+">
+    <!-- Scroll image as a content wrapper -->
+    <div style="
+        position: relative;
+        width: 100%;
+        min-height: 100%;
+        background: url('./sprite/scroll.png') no-repeat top;
+        background-size: cover;
+        padding: 40px 20px 20px 20px;
+        box-sizing: border-box;
+    ">
+        <button onclick="closeScroll()" style="
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #a67c52;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: inherit;
+        ">Close</button>
+
+        <div id="scrollContent" style="
+            background: transparent;
+            padding-top: 80px; /* space at top for scroll margin */
+        ">
+            <!-- Project content will be injected here -->
+        </div>
+    </div>
+</div>
+<div id="skillsPopup">
+  <h2>Skills</h2>
+  <ul id="skillsList">
+    <li data-level="90">JavaScript</li>
+    <li data-level="85">Python</li>
+    <li data-level="70">C++</li>
+    <li data-level="80">SQL</li>
+    <li data-level="65">React</li>
+  </ul>
+  <button onclick="closeSkills()">Close</button>
+</div>
+
+<div id="hintBanner" style="
+  display: none;
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: #f8e3b0;
+  font-family: 'Papyrus', serif;
+  font-size: 20px;
+  padding: 12px 24px;
+  border: 2px solid #d4af37;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  text-align: center;
+  z-index: 2000;
+  transition: opacity 0.4s ease;
+"></div>
+
+<div id="educationPopup">
+  <h2>Education</h2>
+  <ul>
+    <li><strong>Bachelor of Technology in Computer Science</strong><br/>XYZ University, 2022–2026</li>
+    <li><strong>High School</strong><br/>ABC School, 2020</li>
+  </ul>
+  <button onclick="closeEducation()">Close</button>
+</div>
+
+<video id="curtainVideo" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 9999;
+  display: none;
+  pointer-events: none;
+">
+  <source src="sprite/curtainn.mov" type="video/webm">
+  Your browser does not support the video tag.
+</video>
+
+<div id="stoneBanner">
+  <p id="stoneText">Welcome, traveler!</p>
+</div>
+
+<!-- Add inside <body>, maybe near #stoneBanner -->
+<div id="princessDialogue" style="
+  display: none;
+  position: fixed;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  background: linear-gradient(145deg, #ffeedd, #f0e3c8);
+  border: 4px double #b8860b;
+  border-radius: 20px;
+  padding: 20px;
+  font-family: 'Cinzel', serif;
+  color: #4b2e05;
+  text-shadow: 1px 1px 2px #fff8;
+  text-align: center;
+  z-index: 3000;
+  box-shadow: 0 0 20px rgba(0,0,0,0.7);
+">
+  <p id="princessText">Hello, traveler!</p>
+  <button onclick="closePrincessDialogue()" style="
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: linear-gradient(to bottom, #d2a679, #a67c52);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    font-weight: bold;
+  ">Close</button>
+</div>
+
+
+
+<canvas id="gameCanvas"></canvas>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// -------- Input --------
+const keys = {};
+document.addEventListener('keydown', e => keys[e.code] = true);
+document.addEventListener('keyup', e => keys[e.code] = false);
+
+// -------- Player --------
+const player = { x: 50, y: 0, width: 80, height: 128, dx: 0, dy: 0, speed: 5, jump: -16, onGround: false };
+const gravity = 0.6;
+
+// -------- Platforms --------
+let platforms = [];
+
+
+// -------- Portfolio Tile --------
+// const portfolioTile = { x: 600, y: 0, width: 50, height: 40 };
+// let resumeOpened = false;
+
+//--------gates------
+const gates = [
+  { name: 'Resume', x: 200, y: 0, width: 120, height: 80, frames: ['resume1.png', 'resume2.png'], link: 'https://drive.google.com/file/d/1FykWiM-epKY8t_qZXYk5Tm25L4zGvhz3/view?usp=sharing', opened: false },
+  { name: 'Projects', x: 450, y: 0, width: 120, height: 80, frames: ['projects1.png','projects2.png'], frameIndex: 0, link: 'https://your-projects-link.com', opened: false },
+  { name: 'Skills', x: 750, y: 0, width: 120, height: 80, frames: ['skills1.png','skills2.png'], frameIndex: 0, link: 'https://your-skills-link.com', opened: false },
+  { name: 'Education', x: 1050, y: 0, width: 120, height: 80, frames: ['education1.png','education2.png','education3.png','education4.png'], frameIndex: 0, link: 'https://your-education-link.com', opened: false },
+  { name: 'Achievements', x: 1350, y: 0, width: 120, height: 80, frames: ['achievements1.png','achievements2.png'], link: 'https://your-achievements-link.com', opened: false },
+];
+
+const treasureGate = gates[1]; // assuming Projects is the first gate
+const skillsGate= gates[2];
+const educationGate= gates[3];
+const achievementsGate= gates[4];
+const resumeGate= gates[0];
+
+
+const projects = [
+  { title: "GetSetGo", description: "Awesome project 1 details", link: "https://link1.com" },
+  { title: "GymIntel", description: "Awesome project 2 details", link: "https://link2.com" },
+  { title: "PipeLine", description: "Awesome project 3 details", link: "https://link3.com" },
+  { title: "Carbon Emission Footprint Calculator", description: "Amazing project 4 with interactive UI", link: "https://link4.com" },
+  { title: "Indial Sign Language to native Indian languages as text and speech", description: "Innovative project 5 with AI features", link: "https://link5.com" },
+  { title: "Project 6", description: "Project 6 focused on data visualization", link: "https://link6.com" },
+  { title: "Project 7", description: "Mobile app project 7 with Flutter", link: "https://link7.com" },
+  { title: "Project 8", description: "Web3 project 8 exploring blockchain", link: "https://link8.com" },
+  { title: "Project 9", description: "Machine learning project 9 using NLP", link: "https://link9.com" },
+  { title: "Project 10", description: "Fun game project 10 using Canvas API", link: "https://link10.com" }
+];
+
+
+gates.forEach(g => {
+  if (g.frames) { // only for Skills, Projects, Education
+    g.imgFrames = g.frames.map(src => {
+      const img = new Image();
+      img.src = `./sprite/${src}`;
+      return img;
+    });
+  }
+});
+
+
+
+// -------- Load Jump Frames --------
+const NUM_JUMP_FRAMES = 12;
+const jumpFrames = [];
+for (let i = 1; i <= NUM_JUMP_FRAMES; i++) {
+  const img = new Image();
+  img.src = `./sprite/jump${i}.png`; // make sure path is correct
+  jumpFrames.push(img);
+}
+
+// ---------Load Run Frames ---------
+const NUM_RUN_FRAMES = 14;
+const runFrames = [];
+for (let i = 0; i <= NUM_RUN_FRAMES; i++) {
+  const img = new Image();
+  img.src = `./sprite/run${i}.png`;
+  runFrames.push(img);
+}
+
+//------------Platform-----------------
+const platformImg = new Image();
+platformImg.src = './sprite/floor.png'; // replace with your floor image path
+
+//----curtain----------------------
+function playCurtainVideo(callback) {
+  const video = document.getElementById("curtainVideo");
+  
+  video.style.display = "block";
+  video.currentTime = 0;  // rewind to start
+  video.play();
+
+  video.onended = () => {
+    video.style.display = "none";
+    if (callback) callback();
+  };
+}
+
+
+// -------- Animation --------
+let frameIndex = 0;
+const frameInterval = 5;
+let frameTimer = 0;
+
+// -------- Canvas Resize --------
+function resizeCanvas() {
+  canvas.width = Math.max(window.innerWidth, 1500); // make it at least wide enough for all gates
+  canvas.height = window.innerHeight;
+
+  platforms[0] = { x: 0, y: canvas.height - 80, width: canvas.width, height: 80 }; // ground
+  // Add another platform above the ground
+  platforms.push({
+    x: 400,        // horizontal position
+    y: canvas.height - 250, // vertical position (higher than ground)
+    width: 600,
+    height: 20
+  });
+  // Update gates y position
+  gates.forEach(g => g.y = platforms[0].y - g.height);
+
+  // Player starts on ground
+  player.y = platforms[0].y - player.height;
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function updateAnimation() {
+  frameTimer++;
+  if (player.onGround) {
+    if (player.dx !== 0) {
+      // Running
+      if (frameTimer >= frameInterval) {
+        frameTimer = 0;
+        frameIndex = (frameIndex + 1) % NUM_RUN_FRAMES;
+      }
+    } else {
+      // Idle
+      frameIndex = 0;
+    }
+  } else {
+    // Jumping
+    if (frameTimer >= frameInterval) {
+      frameTimer = 0;
+      frameIndex = (frameIndex + 1) % NUM_JUMP_FRAMES;
+    }
+  }
+}
+const scrollDiv = document.getElementById('projectScroll');
+scrollDiv.addEventListener('scroll', () => {
+    scrollDiv.style.backgroundPosition = `center ${scrollDiv.scrollTop * 0.5}px`;
+});
+
+function showBanner(message) {
+    const banner = document.getElementById('hintBanner');
+    banner.innerText = message;
+    banner.style.display = 'block';
+    banner.style.opacity = '1';
+}
+
+function hideBanner() {
+    const banner = document.getElementById('hintBanner');
+    banner.style.opacity = '0';
+    setTimeout(() => {
+        banner.style.display = 'none';
+    }, 400); // match transition duration
+}
+
+
+
+function showScroll() {
+    const content = document.getElementById('scrollContent');
+    content.innerHTML = ''; // clear previous content
+
+    projects.forEach((p, index) => {
+    const div = document.createElement('div');
+
+    // Set margin-bottom for all
+    div.style.marginBottom = '20px';
+
+    // Adjust margin-top for the first project only
+    const titleMargin = index === 0 ? '80px 0 5px 0' : '0 0 5px 0';
+
+    div.innerHTML = `
+        <h3 style="margin:${titleMargin};">${p.title}</h3>
+        <p style="margin:0 0 5px 0;">${p.description}</p>
+        <a href="${p.link}" target="_blank" style="color:#8b4513; text-decoration: underline;">Open Project</a>
+    `;
+
+    content.appendChild(div);
+});
+
+
+    document.getElementById('projectScroll').style.display = 'block';
+}
+
+
+
+function closeScroll() {
+    document.getElementById('projectScroll').style.display = 'none';
+}
+
+
+
+//skills
+function showSkills() {
+  const popup = document.getElementById('skillsPopup');
+  popup.style.display = 'block';
+  const listItems = document.querySelectorAll('#skillsList li');
+  listItems.forEach(li => {
+    const level = li.dataset.level;
+    li.querySelector('::after'); // pseudo-element can't be selected directly
+    li.style.position = 'relative';
+    let bar = document.createElement('div');
+    bar.style.position = 'absolute';
+    bar.style.left = 0;
+    bar.style.top = 0;
+    bar.style.height = '100%';
+    bar.style.width = '0%';
+    bar.style.background = 'linear-gradient(to right, #b8860b, #ffdf7e)';
+    bar.style.borderRadius = '12px';
+    bar.style.zIndex = '-1';
+    li.appendChild(bar);
+    setTimeout(() => bar.style.width = level + '%', 100); // animate width
+  });
+}
+
+function closeSkills() {
+  document.getElementById('skillsPopup').style.display = 'none';
+}
+
+
+//education
+function showEducation() {
+  document.getElementById('educationPopup').style.display = 'block';
+}
+
+function closeEducation() {
+  document.getElementById('educationPopup').style.display = 'none';
+}
+
+
+//all
+// -------- Close scroll with ESC --------
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Escape") {
+    closeScroll();
+    closeEducation();
+    closeSkills()
+  }
+});
+
+//princess
+// Add this to your <script> section
+
+// Princess setup
+const princess = {
+  x: 500,            // platform x
+  y: canvas.height - 250 - 100,  // adjust to platform height minus her sprite height
+  width: 30,
+  height: 110,
+  imgSrc: './sprite/princess.png' // your princess sprite
+};
+
+const princessImg = new Image();
+princessImg.src = princess.imgSrc;
+let nearPrincess = false;
+
+
+// -------- LLM Chat Setup for Princess --------
+const princessChatHistory = []; // keep track of conversation for context
+
+async function talkToPrincess(userMessage) {
+    const dialogue = document.getElementById('princessDialogue');
+    const text = document.getElementById('princessText');
+
+    // Add user message to history
+    if (!window.princessChatHistory) window.princessChatHistory = [];
+    princessChatHistory.push({ role: "user", content: userMessage });
+    
+
+    try {
+        console.log("Sending message to /api/chat:", userMessage);
+
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userMessage })
+        });
+        console.log("HTTP status:", res.status, res.statusText);
+
+        console.log("Raw response object:", res);
+
+        // Check for HTTP errors
+        if (!res.ok) {
+            console.error("HTTP error! Status:", res.status, res.statusText);
+            text.innerText = `Server error: ${res.status}`;
+            dialogue.style.display = 'block';
+            return;
+        }
+
+        const textResponse = await res.text(); // get raw text first
+        console.log("Raw response text:", textResponse);
+
+        let data;
+        try {
+            data = JSON.parse(textResponse); // parse JSON
+        } catch (jsonErr) {
+            console.error("JSON parse error:", jsonErr);
+            text.innerText = "Invalid server response!";
+            dialogue.style.display = 'block';
+            return;
+        }
+
+        console.log("Parsed response data:", data);
+
+        const aiReply = data.reply || "Hmm... I have no idea.";
+        princessChatHistory.push({ role: "assistant", content: aiReply });
+
+        text.innerText = aiReply;
+        dialogue.style.display = 'block';
+
+    } catch (err) {
+        console.error("Error talking to Princess AI:", err);
+        text.innerText = "Oops, something went wrong!";
+        dialogue.style.display = 'block';
+    }
+}
+
+
+// -------- Trigger Chat on SPACE near Princess --------
+document.addEventListener('keydown', async (e) => {
+    if (e.code === "Space" && nearPrincess) {
+        e.preventDefault();
+
+        // Ask the player for input
+        const userMessage = prompt("Say something to Varda:");
+        if (userMessage && userMessage.trim() !== "") {
+            await talkToPrincess(userMessage.trim());
+        }
+    }
+});
+
+
+const princessLines = [
+  "Welcome to my castle!",
+  "Be careful with the gates ahead.",
+  "I hope you like my portfolio!",
+  "Have you seen the projects yet?"
+];
+
+function drawPrincess() {
+  if (!princessImg.complete) {
+    ctx.fillStyle = 'pink';
+    ctx.fillRect(princess.x, princess.y, princess.width, princess.height);
+    return;
+  }
+  ctx.drawImage(princessImg, princess.x, princess.y, princess.width, princess.height);
+}
+
+async function showPrincessDialogue() {
+    const dialogue = document.getElementById('princessDialogue');
+    const text = document.getElementById('princessText');
+
+    // Ask the player for input via a prompt (or later we can do a text input in the box)
+    const userMessage = prompt("Say something to Varda:");
+    if (!userMessage || userMessage.trim() === "") return;
+
+    // Add user message to chat history (optional, can store globally)
+    if (!window.princessChatHistory) window.princessChatHistory = [];
+    window.princessChatHistory.push({ role: "user", content: userMessage.trim() });
+
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userMessage.trim() })
+        });
+
+        const data = await res.json();
+        const aiReply = data.reply || "Hmm... I have no idea.";
+
+        // Add AI reply to history
+        window.princessChatHistory.push({ role: "assistant", content: aiReply });
+
+        // Show AI reply in the dialogue box
+        text.innerText = aiReply;
+        dialogue.style.display = 'block';
+    } catch (err) {
+        console.error("Error talking to Princess AI:", err);
+        text.innerText = "Oops, something went wrong!";
+        dialogue.style.display = 'block';
+    }
+}
+
+function closePrincessDialogue() {
+  document.getElementById('princessDialogue').style.display = 'none';
+}
+
+
+
+
+// -------- Update --------
+function update() {
+  player.dx = 0;
+  if (keys['ArrowLeft']) player.dx = -player.speed;
+  if (keys['ArrowRight']) player.dx = player.speed;
+
+  // Horizontal movement (can move while climbing if desired)
+  player.x += player.dx;
+  player.dy += gravity;
+  player.y += player.dy;
+
+  // Platform collisions
+  player.onGround = false;
+  platforms.forEach(p => {
+    if (
+      player.x < p.x + p.width &&
+      player.x + player.width > p.x &&
+      player.y < p.y + p.height &&
+      player.y + player.height > p.y
+    ) {
+      if (player.dy >= 0) {
+        player.y = p.y - player.height;
+        player.dy = 0;
+        player.onGround = true;
+      }
+    }
+  });
+  gates.forEach(g => {
+    if (g.frames) { // animated only
+      const inArea = player.x < g.x + g.width &&
+                    player.x + player.width > g.x &&
+                    player.y < g.y + g.height &&
+                    player.y + player.height > g.y;
+
+      if (inArea) {
+        if (!g.timer) g.timer = 0;
+        g.timer++;
+        const frameSpeed= 40;
+        if (g.timer % frameSpeed === 0) { // change frame every 15 ticks
+          g.frameIndex = (g.frameIndex + 1) % g.imgFrames.length;
+        }
+      } else {
+        g.frameIndex = 0; // default first image
+        g.timer = 0;
+      }
+    }
+  });
+
+  const nearTreasure = player.x < treasureGate.x + treasureGate.width &&
+                      player.x + player.width > treasureGate.x &&
+                      player.y < treasureGate.y + treasureGate.height &&
+                      player.y + player.height > treasureGate.y;
+
+  const nearEducation = player.x < educationGate.x + educationGate.width &&
+                      player.x + player.width > educationGate.x &&
+                      player.y < educationGate.y + educationGate.height &&
+                      player.y + player.height > educationGate.y;
+
+  const nearSkills = player.x <skillsGate.x + skillsGate.width &&
+                    player.x + player.width > skillsGate.x &&
+                    player.y < skillsGate.y +skillsGate.height &&
+                    player.y + player.height > skillsGate.y
+
+  const nearResume = player.x <resumeGate.x + resumeGate.width &&
+                    player.x + player.width > resumeGate.x &&
+                    player.y < resumeGate.y +resumeGate.height &&
+                    player.y + player.height > resumeGate.y
+
+  const nearAchievements= player.x <achievementsGate.x + achievementsGate.width &&
+                    player.x + player.width > achievementsGate.x &&
+                    player.y < achievementsGate.y +achievementsGate.height &&
+                    player.y + player.height > achievementsGate.y
+
+  const nearPrincess = 
+      player.x + player.width > princess.x - 50 &&   // 50px extra on the left
+      player.x < princess.x + princess.width + 50 && // 50px extra on the right
+      player.y + player.height > princess.y - 50 &&  // 50px extra above
+      player.y < princess.y + princess.height + 50;  // 50px extra below
+
+
+  if (nearTreasure && !document.getElementById('projectScroll').style.display.includes('block')) {
+    showBanner("Press SPACEBAR to view Projects");
+  } else if (nearEducation && !document.getElementById('educationPopup').style.display.includes('block')) {
+      showBanner("Press SPACEBAR to view Educational Details");
+  } else if(nearSkills && !document.getElementById('skillsPopup').style.display.includes('block')){
+      showBanner('Press SPACEBAR to view Skills');
+  } else if(nearResume){
+    showBanner('Press SPACEBAR to view Resume');
+  } else if(nearPrincess){
+    showBanner('Press SPACEBAR to interact with Varda');
+  }
+  else {
+      hideBanner();
+  }
+  if (keys['Space'] && nearPrincess) {
+      showPrincessDialogue();
+      keys['Space'] = false;
+  } else if (keys['Space'] && nearTreasure) {
+      playCurtainVideo(showScroll);
+      keys['Space'] = false;
+  } else if (keys['Space'] && nearEducation) {
+      playCurtainVideo(showEducation);
+      keys['Space'] = false;
+  } else if (keys['Space'] && nearSkills) {
+      playCurtainVideo(showSkills);
+      keys['Space'] = false;
+  } else if (keys['Space'] && nearResume) {
+      playCurtainVideo(() => window.open(resumeGate.link, '_blank'));
+      keys['Space'] = false;
+  } else if (keys['Space'] && player.onGround) {
+      player.dy = player.jump;
+      keys['Space'] = false;
+  }
+
+
+  updateAnimation();
+  // Boundaries
+  if (player.x < 0) player.x = 0;
+  if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+}
+
+// -------- Draw --------
+function drawPlayer() {
+  let img;
+  if (!player.onGround) {
+    img = jumpFrames[frameIndex];
+  } else if (player.dx !== 0) {
+    img = runFrames[frameIndex];
+  } else {
+    img = runFrames[0]; // idle
+  }
+
+  if (!img.complete) {
+    ctx.fillStyle = 'red';
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+    return;
+  }
+
+  // Calculate proportional width to maintain aspect ratio
+  const scale = player.height / img.height; // scale based on desired player height
+  const drawWidth = img.width * scale;
+  const drawHeight = player.height; // keep consistent height
+
+  ctx.save();
+  if (player.dx < 0) { // moving left
+    ctx.translate(player.x + drawWidth / 2, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(img, -drawWidth / 2, player.y, drawWidth, drawHeight);
+  } else {
+    ctx.drawImage(img, player.x, player.y, drawWidth, drawHeight);
+  }
+  ctx.restore();
+
+  // Update player.width for collision detection
+  player.width = drawWidth;
+}
+
+
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Platforms
+//   ctx.fillStyle = 'green';
+  // Platforms
+  platforms.forEach(p => {
+    if (platformImg.complete) {
+      ctx.drawImage(platformImg, p.x, p.y, p.width, p.height);
+    } else {
+      ctx.fillStyle = 'green';
+      ctx.fillRect(p.x, p.y, p.width, p.height);
+    }
+  });
+  // Set color to light gray
+  ctx.fillStyle = '#ccbbcc'; // or 'lightgray'
+
+  // Draw rectangle: x, y, width, height
+  ctx.fillRect(0, canvas.height - 100, canvas.width, 20);
+
+ 
+  drawPrincess();
+
+
+  gates.forEach(g => {
+    if (g.frames) {
+      const img = g.imgFrames[g.frameIndex];
+      if (img.complete) {
+        ctx.drawImage(img, g.x, g.y, g.width, g.height);
+      }
+    } else {
+      // static rectangle for Resume & Achievements
+      ctx.fillStyle = 'gold';
+      ctx.fillRect(g.x, g.y, g.width, g.height);
+      
+      ctx.fillStyle = 'black';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(g.name, g.x + g.width/2, g.y + g.height/2 + 4);
+    }
+  });
+
+
+  // Player
+  drawPlayer();
+}
+
+// -------- Game Loop --------
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+// -------- Preload frames & start --------
+function preloadFrames(frames, callback) {
+  let loaded = 0;
+  frames.forEach(img => {
+    img.onload = () => { loaded++; if (loaded === frames.length) callback(); }
+    img.onerror = () => { console.error('Failed to load', img.src); loaded++; if (loaded === frames.length) callback(); }
+  });
+}
+
+preloadFrames(jumpFrames, () => {
+  gameLoop();
+});
+
+</script>
+</body>
+</html>
