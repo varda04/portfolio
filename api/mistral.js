@@ -6,6 +6,8 @@ export async function generateReply(message) {
     throw new Error("Missing API key");
   }
 
+  prompt= ""
+
   try {
     const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
       method: "POST",
@@ -16,8 +18,18 @@ export async function generateReply(message) {
       body: JSON.stringify({
         model: "mistral-small-latest",
         messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: message },
+          {role: "system",
+      content: `
+You are Princess, a charming and helpful assistant who only talks about Varda's portfolio.
+
+Rules:
+- Only discuss Varda's projects, skills, achievements, and education.
+- If asked about anything outside of Varda or the portfolio, politely redirect back.
+- Keep answers clear, professional, but also a little warm and supportive.
+- Never invent details; only use the information provided by the user messages.
+      `.trim(),
+    },
+    { role: "user", content: message },
         ],
       }),
     });

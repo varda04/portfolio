@@ -4,8 +4,22 @@
   <meta charset="utf-8" />
   <title>Prince Portfolio MVP</title>
   <style>
-    html, body { height: 100%; margin: 0; }
-    canvas { background: #000000; display: block; margin: 0 auto; }
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* optional, keeps layout tight */
+  overflow-x: auto;
+}
+
+/* Transparent canvas so stone shows through */
+canvas {
+  background: transparent;
+  display: block;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1; /* sits above stone, below UI */
+}
+
     #scrollContent {
         background: transparent;
         padding: 20px;
@@ -113,7 +127,6 @@
   0% { opacity: 0; transform: translate(-50%, -55%) scale(0.95); }
   100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
-
 #skillsPopup {
   display: none;
   position: fixed;
@@ -122,6 +135,7 @@
   transform: translate(-50%, -50%);
   width: 600px;
   max-width: 90%;
+  max-height: 70vh;      /* limit popup height */
   background: linear-gradient(145deg, #fdf6e3, #f0e3c8);
   border: 4px double #b8860b;
   border-radius: 20px;
@@ -132,21 +146,25 @@
   box-shadow: 0 0 30px rgba(0,0,0,0.7);
   z-index: 2000;
   animation: popupFade 0.4s ease-out;
-}
-
-#skillsPopup h2 {
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 32px;
-  color: #8b4513;
-  border-bottom: 3px dotted #d4af37;
-  padding-bottom: 12px;
-  font-family: 'Almendra', serif;
+  overflow: hidden;      /* prevents outer scrollbar */
 }
 
 #skillsPopup ul {
   list-style: none;
   padding: 0;
+  margin: 0;
+  max-height: 50vh;      /* 👈 restrict list height */
+  overflow-y: auto;      /* 👈 scrolls internally */
+  padding-right: 10px;   /* space for scrollbar */
+}
+
+#skillsPopup ul::-webkit-scrollbar {
+  width: 8px;            /* custom scrollbar width */
+}
+
+#skillsPopup ul::-webkit-scrollbar-thumb {
+  background: #d4af37;
+  border-radius: 8px;
 }
 
 #skillsPopup li {
@@ -156,42 +174,6 @@
   border-left: 4px solid #d4af37;
   border-radius: 12px;
   position: relative;
-}
-
-#skillsPopup li::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 100%;
-  width: 0;
-  background: linear-gradient(to right, #b8860b, #ffdf7e);
-  border-radius: 12px;
-  z-index: -1;
-  transition: width 1s ease-in-out;
-}
-
-#skillsPopup li[data-level]::after {
-  width: attr(data-level '%'); /* fallback for JS below */
-}
-
-#skillsPopup button {
-  display: block;
-  margin: 25px auto 0;
-  padding: 12px 28px;
-  background: linear-gradient(to bottom, #d2a679, #a67c52);
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-family: inherit;
-  cursor: pointer;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px #4b2e05;
-  transition: all 0.3s ease;
-}
-#skillsPopup button:hover {
-  background: linear-gradient(to bottom, #b47b50, #8b5e3c);
-  transform: translateY(-2px);
 }
 
 #stoneBanner {
@@ -255,13 +237,75 @@
 </div>
 <div id="skillsPopup">
   <h2>Skills</h2>
-  <ul id="skillsList">
-    <li data-level="90">JavaScript</li>
-    <li data-level="85">Python</li>
-    <li data-level="70">C++</li>
-    <li data-level="80">SQL</li>
-    <li data-level="65">React</li>
-  </ul>
+  <div id="skillsScroll">
+    <ul id="skillsList">
+      <!-- Languages and Databases -->
+      <li><strong>Languages & Databases</strong></li>
+      <li data-level="90">Python</li>
+      <li data-level="85">C/C++</li>
+      <li data-level="80">Java</li>
+      <li data-level="90">JavaScript / TypeScript</li>
+      <li data-level="80">SQL (PostgreSQL, MySQL)</li>
+      <li data-level="75">MongoDB</li>
+      <li data-level="70">NoSQL (Redis, Firebase, Supabase)</li>
+
+      <!-- Frameworks and Libraries -->
+      <li><strong>Frameworks & Libraries</strong></li>
+      <li data-level="80">React</li>
+      <li data-level="75">Node.js</li>
+      <li data-level="80">Django</li>
+      <li data-level="75">Flask</li>
+      <li data-level="80">FastAPI</li>
+      <li data-level="75">Express.js</li>
+      <li data-level="70">TensorFlow</li>
+      <li data-level="70">PyTorch</li>
+      <li data-level="75">scikit-learn</li>
+      <li data-level="80">Pandas</li>
+      <li data-level="80">NumPy</li>
+
+      <!-- Data Science & Machine Learning -->
+      <li><strong>Data Science & Machine Learning</strong></li>
+      <li data-level="75">Data Preprocessing & Cleaning</li>
+      <li data-level="75">Feature Engineering</li>
+      <li data-level="70">Exploratory Data Analysis (EDA)</li>
+      <li data-level="70">Supervised Learning (Regression, Decision Trees, Random Forests, Boosting)</li>
+      <li data-level="65">Unsupervised Learning (Clustering, Dimensionality Reduction)</li>
+      <li data-level="70">Deep Learning (CNNs, RNNs, Transformers)</li>
+      <li data-level="70">Model Evaluation & Optimization</li>
+
+      <!-- AI & LLMs -->
+      <li><strong>AI & LLMs</strong></li>
+      <li data-level="75">Crew AI</li>
+      <li data-level="70">LangGraph</li>
+      <li data-level="70">Vapi (Voice Agents)</li>
+      <li data-level="75">Ollama (Local LLMs)</li>
+      <li data-level="75">LangChain</li>
+      <li data-level="80">OpenAI / Anthropic APIs</li>
+      <li data-level="70">Vector Databases (ChromaDB)</li>
+
+      <!-- Data Structures & Algorithms -->
+      <li><strong>Data Structures & Algorithms</strong></li>
+      <li data-level="80">Dynamic Programming</li>
+      <li data-level="75">Greedy Algorithms</li>
+      <li data-level="75">Graph Algorithms</li>
+      <li data-level="70">Trees</li>
+      <li data-level="70">Bit Manipulation</li>
+      <li data-level="70">Sliding Window</li>
+      <li data-level="75">Hashing</li>
+      <li data-level="70">Divide & Conquer</li>
+      <li data-level="65">Backtracking</li>
+
+      <!-- Testing & QA -->
+      <li><strong>Testing & QA</strong></li>
+      <li data-level="75">API & Microservice Testing</li>
+      <li data-level="70">Unit Testing</li>
+      <li data-level="70">REST/HTTP Request Validation</li>
+      <li data-level="70">Test Case Design</li>
+      <li data-level="70">Logging & Root Cause Analysis</li>
+      <li data-level="65">Agile Workflow</li>
+      <li data-level="65">JIRA / ServiceNow</li>
+    </ul>
+  </div>
   <button onclick="closeSkills()">Close</button>
 </div>
 
@@ -302,13 +346,9 @@
   display: none;
   pointer-events: none;
 ">
-  <source src="sprite/curtainn.mov" type="video/webm">
+  <source src="sprite/curtain_final.mov" type="video/webm">
   Your browser does not support the video tag.
 </video>
-
-<div id="stoneBanner">
-  <p id="stoneText">Welcome, traveler!</p>
-</div>
 
 <!-- Add inside <body>, maybe near #stoneBanner -->
 <div id="princessDialogue" style="
@@ -384,16 +424,38 @@ const resumeGate= gates[0];
 
 
 const projects = [
-  { title: "GetSetGo", description: "Awesome project 1 details", link: "https://link1.com" },
-  { title: "GymIntel", description: "Awesome project 2 details", link: "https://link2.com" },
-  { title: "PipeLine", description: "Awesome project 3 details", link: "https://link3.com" },
-  { title: "Carbon Emission Footprint Calculator", description: "Amazing project 4 with interactive UI", link: "https://link4.com" },
-  { title: "Indial Sign Language to native Indian languages as text and speech", description: "Innovative project 5 with AI features", link: "https://link5.com" },
-  { title: "Project 6", description: "Project 6 focused on data visualization", link: "https://link6.com" },
-  { title: "Project 7", description: "Mobile app project 7 with Flutter", link: "https://link7.com" },
-  { title: "Project 8", description: "Web3 project 8 exploring blockchain", link: "https://link8.com" },
-  { title: "Project 9", description: "Machine learning project 9 using NLP", link: "https://link9.com" },
-  { title: "Project 10", description: "Fun game project 10 using Canvas API", link: "https://link10.com" }
+  {
+    title: "GetSetGo",
+    description: "A full-stack wellness platform generating personalized diet and workout plans using LLMs and voice-based data intake workflows. Features AI persona phone-call-like interface via Vapi, Convex webhooks for real-time backend sync, Clerk for auth, and deployed with Next.js on Vercel.",
+    link: "https://get-set-go-five.vercel.app/",
+    github: "https://github.com/varda04/GetSetGo"
+  },
+  {
+    title: "GymIntel",
+    description: "A multilingual analytics and query resolution platform with dashboards and user support, powered by local LLMs (Ollama). Built RESTful APIs in FastAPI, backend queries on MongoDB, and CrewAI-powered AI agent architecture with 15+ specialized tools.",
+    github: "https://github.com/varda04/GymIntel"
+  },
+  {
+    title: "SwipeFlix",
+    description: "A movie selection platform enabling real-time preference matching in virtual rooms. Built with Kotlin, Supabase (PostgreSQL), and custom auth logic for room codes.",
+    github: "https://github.com/vishesh2201/SwipeFlix"
+  },
+  {
+    title: "PipeLine",
+    description: "A Django-powered gas utility portal connecting customers and support staff seamlessly. Features role-based login, multiple file attachments, CSRF-protected forms, and admin-side ticket management with a clean modular UI.",
+    github: "https://github.com/varda04/PipeLine"
+  },
+  {
+    title: "Carbon Emission Footprint Calculator",
+    description: "A project focused on calculating and analyzing individual carbon footprints, providing insights into sustainability and eco-friendly practices.",
+    github: "https://github.com/varda04/dsbda_miniproj"
+  },
+  {
+    title: "Indian Sign Language Translator",
+    description: "An AI-powered project converting Indian Sign Language to native Indian languages as text and speech, enhancing accessibility and communication.",
+    link: null,
+    github: null
+  }
 ];
 
 
@@ -599,13 +661,19 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+
+//stone
+
+const stoneImg = new Image();
+stoneImg.src = './sprite/stone.png';
+
 //princess
 // Add this to your <script> section
 
 // Princess setup
 const princess = {
-  x: 500,            // platform x
-  y: canvas.height - 250 - 100,  // adjust to platform height minus her sprite height
+  x: 900,            // platform x
+  y: canvas.height - 250 - 110,  // adjust to platform height minus her sprite height
   width: 30,
   height: 110,
   imgSrc: './sprite/princess.png' // your princess sprite
@@ -870,6 +938,8 @@ function update() {
   if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 }
 
+
+
 // -------- Draw --------
 function drawPlayer() {
   let img;
@@ -906,8 +976,6 @@ function drawPlayer() {
   player.width = drawWidth;
 }
 
-
-
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -915,8 +983,11 @@ function draw() {
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Platforms
-//   ctx.fillStyle = 'green';
+  // Stone background (behind everything else)
+  if (stoneImg.complete) {
+    ctx.drawImage(stoneImg, 50, 50, canvas.width - 1000, canvas.height - 150); 
+  }
+
   // Platforms
   platforms.forEach(p => {
     if (platformImg.complete) {
@@ -926,16 +997,15 @@ function draw() {
       ctx.fillRect(p.x, p.y, p.width, p.height);
     }
   });
-  // Set color to light gray
-  ctx.fillStyle = '#ccbbcc'; // or 'lightgray'
 
-  // Draw rectangle: x, y, width, height
+  // Ground strip
+  ctx.fillStyle = '#ccbbcc';
   ctx.fillRect(0, canvas.height - 100, canvas.width, 20);
 
- 
+  // Princess
   drawPrincess();
 
-
+  // Gates
   gates.forEach(g => {
     if (g.frames) {
       const img = g.imgFrames[g.frameIndex];
@@ -943,10 +1013,9 @@ function draw() {
         ctx.drawImage(img, g.x, g.y, g.width, g.height);
       }
     } else {
-      // static rectangle for Resume & Achievements
       ctx.fillStyle = 'gold';
       ctx.fillRect(g.x, g.y, g.width, g.height);
-      
+
       ctx.fillStyle = 'black';
       ctx.font = '12px Arial';
       ctx.textAlign = 'center';
@@ -954,9 +1023,17 @@ function draw() {
     }
   });
 
-
   // Player
   drawPlayer();
+  // function updateScroll() {
+  //   const canvasLeft = canvas.getBoundingClientRect().left;
+  //   const playerScreenX = player.x - canvasLeft;
+
+  //   // Scroll canvas when player moves past 70% of viewport
+  //   const threshold = window.innerWidth * 0.7;
+  //   if (playerScreenX > threshold) {
+  //     window.scrollBy(playerScreenX - threshold, 0);
+  // }
 }
 
 // -------- Game Loop --------
