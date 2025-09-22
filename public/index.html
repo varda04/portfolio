@@ -915,16 +915,16 @@ function update() {
       showPrincessDialogue();
       keys['Space'] = false;
   } else if (keys['Space'] && nearTreasure) {
-      playCurtainVideo(showScroll);
+      showScroll();
       keys['Space'] = false;
   } else if (keys['Space'] && nearEducation) {
-      playCurtainVideo(showEducation);
+      showEducation();
       keys['Space'] = false;
   } else if (keys['Space'] && nearSkills) {
-      playCurtainVideo(showSkills);
+      showSkills();
       keys['Space'] = false;
   } else if (keys['Space'] && nearResume) {
-      playCurtainVideo(() => window.open(resumeGate.link, '_blank'));
+      () => window.open(resumeGate.link, '_blank');
       keys['Space'] = false;
   } else if (keys['Space'] && player.onGround) {
       player.dy = player.jump;
