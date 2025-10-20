@@ -187,6 +187,78 @@ canvas {
   text-align: center;
 
 }
+#achievementsPopup {
+  display: none;
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  max-width: 90%;
+  background: linear-gradient(145deg, #fff8dc, #f5deb3); /* light golden parchment */
+  border: 4px double #c9a227; /* golden border */
+  border-radius: 20px;
+  padding: 30px 40px;
+  font-family: 'Cinzel', serif;
+  color: #4a3005;
+  text-shadow: 1px 1px 3px #fff9;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.75);
+  z-index: 2000;
+  animation: popupFade 0.4s ease-out;
+}
+
+#achievementsPopup h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 32px;
+  color: #b8860b;
+  border-bottom: 3px dotted #ffd700;
+  padding-bottom: 12px;
+  font-family: 'Almendra', serif;
+  letter-spacing: 1px;
+}
+
+#achievementsPopup ul {
+  list-style: none;
+  padding: 0;
+}
+
+#achievementsPopup li {
+  margin: 18px 0;
+  padding: 15px;
+  background: rgba(255, 239, 180, 0.7); /* glowing parchment tone */
+  border-left: 4px solid #ffd700; /* gold accent line */
+  border-radius: 12px;
+  box-shadow: inset 0 0 8px rgba(218, 165, 32, 0.4);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+#achievementsPopup li:hover {
+  transform: scale(1.05);
+  background: rgba(255, 239, 180, 0.85);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+}
+
+#achievementsPopup button {
+  display: block;
+  margin: 25px auto 0;
+  padding: 12px 28px;
+  background: linear-gradient(to bottom, #ffd700, #b8860b);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #4b2e05;
+  transition: all 0.3s ease;
+}
+
+#achievementsPopup button:hover {
+  background: linear-gradient(to bottom, #e6b800, #a67c00);
+  transform: translateY(-2px);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
   </style>
 </head>
 <body>
@@ -331,10 +403,24 @@ canvas {
 <div id="educationPopup">
   <h2>Education</h2>
   <ul>
-    <li><strong>Bachelor of Technology in Computer Science</strong><br/>XYZ University, 2022–2026</li>
-    <li><strong>High School</strong><br/>ABC School, 2020</li>
+    <li><strong>Bachelor of Technology in Computer Science with Honors in AIML</strong><br/>International Institute of Information Technology Pune, 2022–2026</li>
+    <li><strong>12th Grade</strong><br/>SNBP International School, 2022</li>
+    <li><strong>10th Grade</strong><br/>Indira National School, 2020</li>
   </ul>
   <button onclick="closeEducation()">Close</button>
+</div>
+
+<!-- Achievements Popup -->
+<div id="achievementsPopup">
+  <h2>Achievements</h2>
+  <ul>
+    <li><strong>250+ Leetcode Problems Solved</strong>: Strengthened problem-solving and data structure skills through consistent daily practice.</li>
+
+    <li><strong>Smart India Hackathon 2025 – Team Leader</strong>: Led a 6-member team- qualified for Round 2 with a white-box AI-based Optimization and ranking algorithm under the Kochi Metro Rail initiative.</li>
+
+    <li><strong>National-Level Football Player</strong>: Represented Maharashtra in 3× National and 3× State tournaments- led school team to multiple championships (ZP, Subroto).</li>
+  </ul>
+  <button onclick="closeAchievements()">Close</button>
 </div>
 
 <video id="curtainVideo" style="
@@ -650,6 +736,14 @@ function closeEducation() {
   document.getElementById('educationPopup').style.display = 'none';
 }
 
+//achievements
+function showAchievements(){
+  document.getElementById('achievementsPopup').style.display= 'block';
+}
+
+function closeAchievements(){
+  document.getElementById('achievementsPopup').style.display= 'none';
+}
 
 //all
 // -------- Close scroll with ESC --------
@@ -905,6 +999,8 @@ function update() {
       showBanner('Press SPACEBAR to view Skills');
   } else if(nearResume){
     showBanner('Press SPACEBAR to view Resume');
+  } else if(nearAchievements){
+    showBanner('Press SPACEBAR to view Achievments');
   } else if(nearPrincess){
     showBanner('Press SPACEBAR to interact with Varda');
   }
@@ -926,6 +1022,9 @@ function update() {
   } else if (keys['Space'] && nearResume) {
       () => window.open(resumeGate.link, '_blank');
       keys['Space'] = false;
+  } else if (keys['Space'] && nearAchievements){
+    showAchievements();
+    keys['Space']= false;
   } else if (keys['Space'] && player.onGround) {
       player.dy = player.jump;
       keys['Space'] = false;
