@@ -888,7 +888,7 @@ async function showPrincessDialogue() {
             body: JSON.stringify({ message: userMessage.trim() })
         });
 
-        print("Raw response in showPrincessDialogue: ", res)
+        console.log("Raw response in showPrincessDialogue: ", res)
 
         const data = await res.json();
         const aiReply = data.reply || "Hmm... I have no idea.";
